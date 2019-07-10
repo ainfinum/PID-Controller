@@ -39,12 +39,12 @@ Setting the hyperparameter Kd to 0 gives the following result:
 
 [![Kp=0 youtube video](./images/Kd_0.jpg)](https://youtu.be/oQOS3idOnqY)
 
-##Hyperparameters
+## Hyperparameters
 PID controller implementation is quite simple but it has three hyperparameters which should be chosen manually or automated with some algorithm. Initial PID controller hyperparameters were chosen manually and Twiddle ( lines ) was used to tune hyperparameters. 
 
 
 ## Speed
-In order to increase the speed of the car PID controller has been tested for throttle as well (lines). Throttle controller hyperparameters were chosen manually. But after several tests the constant throttle value of 0.45 produced the best result.
+In order to increase the speed of the car PID controller has been tested for throttle as well. Throttle controller hyperparameters were chosen manually. But after several tests the constant throttle value of 0.45 produced the best result.
 
 ## Simulator
 After tuning hyperparameters with Twiddle, the car was able to drive around the track with the average speed more than 50MPH.  
