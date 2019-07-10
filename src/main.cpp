@@ -51,24 +51,22 @@ int main()
   */
 
   // Twiddle Coefficients
-  double Kp = 0.09; 
+  double Kp = 0.09;
   double Ki = 0.02;
-  double Kd = 0.0;//0.87;
-
+  double Kd = 0.0; //0.87;
 
   pid.Init(Kp, Ki, Kd);
 
-
-  //Initialize throttle controller 
+  //Initialize throttle controller
   PID throttle;
-  
-  double th_Kp = 4.13;//5;
+
+  double th_Kp = 4.13;
   double th_Ki = 0.0001;
   double th_Kd = 5;
   throttle.Init(th_Kp, th_Ki, th_Kd);
 
   h.onMessage([&pid, &throttle](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
-                     uWS::OpCode opCode) {
+                                uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -89,21 +87,19 @@ int main()
           double speed = std::stod(j[1]["speed"].get<string>());
           double angle = std::stod(j[1]["steering_angle"].get<string>());
           double steer_value = 0.0;
- 
+
           pid.UpdateError(cte);
 
           double total_err = pid.TotalError();
           steer_value -= total_err;
           steer_value = pid.Normalize(steer_value);
 
-          
           //pid.Twiddle(2, 50, total_err);
-           
-          
-          double sp_err =  steer_value*steer_value;
+
+          double sp_err = steer_value * steer_value;
           throttle.UpdateError(sp_err);
-          double throttle_command = throttle.TotalError()*100;
- 
+          double throttle_command = throttle.TotalError() * 100;
+
           //throttle.Twiddle(0, 50, sp_err);
 
           // DEBUG

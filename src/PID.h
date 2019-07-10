@@ -37,7 +37,7 @@ public:
 
   int GetCounter();
 
-  void Twiddle(int tw_index, int steps,double total_err);
+  void Twiddle(int tw_index, int steps, double total_err);
 
 private:
   /**
@@ -58,13 +58,12 @@ private:
   double Kd;
 
   int counter;
- 
+
   double tolerance;
   //int tw_index;
   double best_error;
   double epoch_sum_error;
   double dp[3];
   int twiddle_step;
-
 };
 #endif // PID_H

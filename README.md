@@ -4,32 +4,36 @@ Self-Driving Car Engineer Nanodegree Program
 Implementation of PID control for steering and throttle control using Twiddle for hyperparameter tuning. 
 
 
-##Implementation
+## Implementation
 In this project, the PID controller was implemented in C++. A steering and throttle data are exchanged between PID controlled and Car Simulator via a WebSocket interface.
-Once PID controller receives Cross Track Error (CTE) from the simulator, UpdateError function ( lines ) calculates P, I and D errors. These Errors are used in TotalError (lines) method to calculate total error and adjusted steering value sent back to simulator.
+Once PID controller receives Cross Track Error (CTE) from the simulator, UpdateError function ( PID.cpp, lines 35-47  ) calculates P, I and D errors. These Errors are used in TotalError ( PID.cpp,lines 51-56 ) method to calculate total error and adjusted steering value sent back to simulator.
 
 
-##P, I, D components effects
-###P - Proportional
-The proportional component. P component has a maximum effect on the car's behavior as it is proportional to  Cross Track Error - the car's distance from the lane center
-P = Kp * CTE 
+## P, I, D components effects
+### P - Proportional
+The proportional component. P component has a maximum effect on the car's behavior as it is proportional to Cross Track Error - the car's distance from the lane center.
+
+P = Kp * CTE, where Kp is a hyperparameter
+
 If Kp value is too large the car starts to oscillate around the center line. But if Kp is too low the car cannot drive through curves.
 
-The following video show car behavior with when one P is set to 0:
+The following video demonstrates the difference in performance when the P is set to 0. 
 
 [![Kp=0 youtube video](./images/Kp_0.jpg)](https://youtu.be/NvCxyh5avgo)
 
-###I - Integral
-The integral component reduces drifts from the center line.
+### I - Integral
+The integral component (I) reduces drifts from the center line.
+
 I = Ki * sum(CTE), where Ki is a hyperparameter
 
-The next video shows how setting I term affects car control:
+The next video demonstrates effect of I=0:
 
 [![Kp=0 youtube video](./images/Ki_0.jpg)](https://youtu.be/qkpq2aH3Hbk)
 
-###D - Differential
+### D - Differential
 The differential (D) component of the PID controller is the difference between the current CTE and the previous CTE. It reduces overshooting caused by the P component.
- D = Kd * (CTE - Previous_CTE)
+
+D = Kd * (CTE - Previous_CTE)
 
 Setting the hyperparameter Kd to 0 gives the following result:
 
@@ -39,13 +43,13 @@ Setting the hyperparameter Kd to 0 gives the following result:
 PID controller implementation is quite simple but it has three hyperparameters which should be chosen manually or automated with some algorithm. Initial PID controller hyperparameters were chosen manually and Twiddle ( lines ) was used to tune hyperparameters. 
 
 
-##Speed
+## Speed
 In order to increase the speed of the car PID controller has been tested for throttle as well (lines). Throttle controller hyperparameters were chosen manually. But after several tests the constant throttle value of 0.45 produced the best result.
 
-##Simulator
+## Simulator
 After tuning hyperparameters with Twiddle, the car was able to drive around the track with the average speed more than 50MPH.  
 
-[![youtube video](./images/twiddle_param.jpg)]()
+[![youtube video](./images/twiddle_param.jpg)](https://youtu.be/N-gXqSwN5j0)
 
 
 ## Dependencies

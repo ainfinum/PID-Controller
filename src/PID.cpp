@@ -36,21 +36,21 @@ void PID::UpdateError(double cte)
 {
   prev_cte = p_error;
   p_error = cte;
-  
+
   i_error += cte;
   d_error = cte - prev_cte;
 
   counter++;
- 
-  if (total_error <= -1 && total_error >= 1) {
-		i_error += cte;
-}
 
+  if (total_error <= -1 && total_error >= 1)
+  {
+    i_error += cte;
+  }
 }
 
 double PID::TotalError()
 {
-  double err = Kp * p_error + Ki * i_error/counter + Kd * d_error;
+  double err = Kp * p_error + Ki * i_error / counter + Kd * d_error;
   epoch_sum_error += fabs(err);
   return err;
 }
@@ -64,89 +64,93 @@ double PID::Normalize(double cte)
   return cte;
 }
 
-
-int PID::GetCounter(){
+int PID::GetCounter()
+{
   return counter;
 }
 
-
-void PID::Twiddle(int index, int steps, double total_err) 
+void PID::Twiddle(int index, int steps, double total_err)
 {
 
+  if (counter % steps == 0)
+  {
 
+    if (counter % 600 == 0)
+      best_error = 100;
 
-if( counter % steps == 0){
+    double p[3];
+    p[0] = Kp;
+    p[1] = Ki;
+    p[2] = Kd;
 
-  if( counter % 600 == 0) best_error = 100;
-            
-  double p[3];
-	p[0] = Kp;
-	p[1] = Ki;
-	p[2] = Kd;
+    //double err = fabs(total_err);
+    double err = epoch_sum_error / 50;
+    epoch_sum_error = 0.0;
+    double sum_dp = dp[0] + dp[1] + dp[2];
 
-  //double err = fabs(total_err);
-  double err = epoch_sum_error/50;
-  epoch_sum_error = 0.0;
-  double sum_dp = dp[0] + dp[1] + dp[2];
+    std::cout << "Tunung PID Coefficients "
+              << " Counter: " << counter << " Average Err: " << err << " best_error " << best_error << std::endl;
+    std::cout << "Twiddle_step " << twiddle_step << " Kp: " << Kp << " Ki: " << Ki << " Kd: " << Kd << std::endl;
 
-  std::cout << "Tunung PID Coefficients " << " Counter: " << counter << " Average Err: " <<  err << " best_error " << best_error << std::endl;
-  std::cout << "Twiddle_step " << twiddle_step << " Kp: " << Kp << " Ki: " << Ki << " Kd: " << Kd  << std::endl;
+    if (sum_dp > tolerance)
+    {
 
-  if(sum_dp > tolerance){
+      switch (twiddle_step)
+      {
+      case 1:
 
-  switch (twiddle_step)
-			{
-        case 1:
-				        
-                p[index] += dp[index];
-                twiddle_step = 2;
-                std::cout << "Step 1 " << " dp[index]: " << dp[index] << std::endl;
-                break;
+        p[index] += dp[index];
+        twiddle_step = 2;
+        std::cout << "Step 1 "
+                  << " dp[index]: " << dp[index] << std::endl;
+        break;
 
-        case 2:
-				        
-                if( err < best_error ){
-                  best_error = err;
-                  dp[index] *= 1.1;
-                  std::cout << "Step 2/1 " << " dp[index]: " << dp[index] << std::endl;
-                 
-                }
-                else{
-                  p[index] -= 2 * dp[index];
-                  std::cout << "Step 2/2 " << " dp[index]: " << dp[index] << std::endl;
-                }
-                twiddle_step = 3;
-                
-                break;
+      case 2:
 
-        case 3:
-				        twiddle_step = 1;
-                if( err < best_error ){
-                  best_error = err;
-                  dp[index] *= 1.1;
-                  
-                 std::cout << "Step 3/1 " << " dp[index]: " << dp[index] << std::endl;
-                }
-                else{
-                  p[index] += dp[index];
-                  dp[index] *= 0.9;
-                  std::cout << "Step 3/2 " << " dp[index]: " << dp[index] << std::endl;
-                }
-                break;
+        if (err < best_error)
+        {
+          best_error = err;
+          dp[index] *= 1.1;
+          std::cout << "Step 2/1 "
+                    << " dp[index]: " << dp[index] << std::endl;
+        }
+        else
+        {
+          p[index] -= 2 * dp[index];
+          std::cout << "Step 2/2 "
+                    << " dp[index]: " << dp[index] << std::endl;
+        }
+        twiddle_step = 3;
+
+        break;
+
+      case 3:
+        twiddle_step = 1;
+        if (err < best_error)
+        {
+          best_error = err;
+          dp[index] *= 1.1;
+
+          std::cout << "Step 3/1 "
+                    << " dp[index]: " << dp[index] << std::endl;
+        }
+        else
+        {
+          p[index] += dp[index];
+          dp[index] *= 0.9;
+          std::cout << "Step 3/2 "
+                    << " dp[index]: " << dp[index] << std::endl;
+        }
+        break;
       }
-  
+    }
+
+    Kp = p[0];
+    Ki = p[1];
+    Kd = p[2];
+
+    std::cout << "Kp: " << Kp << " Ki: " << Ki << " Kd: " << Kd << " best_error " << best_error << std::endl;
+    std::cout << "Next twiddle step " << twiddle_step << std::endl;
+    std::cout << "  " << std::endl;
   }
-
-
-	Kp = p[0];
-	Ki = p[1];
-	Kd = p[2];
-
-  std::cout << "Kp: " << Kp << " Ki: " << Ki << " Kd: " << Kd  <<  " best_error " << best_error << std::endl;
-  std::cout << "Next twiddle step " << twiddle_step << std::endl;
-  std::cout << "  " <<  std::endl;
-
-}
-   
-
 }
