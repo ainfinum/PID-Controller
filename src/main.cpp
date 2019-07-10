@@ -53,7 +53,7 @@ int main()
   // Twiddle Coefficients
   double Kp = 0.09;
   double Ki = 0.02;
-  double Kd = 0.0; //0.87;
+  double Kd = 0.87;
 
   pid.Init(Kp, Ki, Kd);
 
@@ -86,7 +86,7 @@ int main()
           double cte = std::stod(j[1]["cte"].get<string>());
           //double speed = std::stod(j[1]["speed"].get<string>());
           //double angle = std::stod(j[1]["steering_angle"].get<string>());
-          
+
           double steer_value = 0.0;
 
           pid.UpdateError(cte);
